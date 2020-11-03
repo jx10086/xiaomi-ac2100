@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [xiaomi-ac2100]
+        target: [redmi-ac2100,xiaomi-ac2100]
         
     steps:
     - name: Checkout
