@@ -1,4 +1,4 @@
-# Actions OpenWrt Snapshot With Nginx
+# Actions OpenWrt Snapshot
 [1]: https://img.shields.io/badge/license-GPLV2-brightgreen.svg
 [2]: /LICENSE
 [3]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
@@ -17,8 +17,6 @@
 [![GitHub Forks](https://img.shields.io/github/forks/garypang13/Actions-OpenWrt-Nginx.svg?style=flat-square&label=Forks)](https://github.com/garypang13/Actions-OpenWrt-Nginx/fork)
 [![PRs Welcome][3]][4]
 [![Issue Welcome][5]][6]
-[![Release Version][7]][8]
-[![Contact Me][10]][11]
 [![AutoBuild][12]][13]
 
 <a href="https://t.me/openwrt_nginx" target="_blank">Telegram</a>
@@ -30,19 +28,29 @@
 
 + 后台一键在线更新固件,省去了每次固件升级都需要找固件,下载固件,上传固件等繁琐操作.
 
-+ 性能,友好度,易用性,插件,以及针对国内特殊环境等的自定义优化
++ 重构版SSR-PLUS,国内外智能DNS解析,支持DOH
 
-+ uhttpd替换为nginx,大大增加可玩性,比如建站,文件服务器,Webdav,反向代理,端口复用...
++ 性能,友好度,易用性,插件,以及针对国内特殊环境等的自定义优化, 开箱即用
 
-+ 内置AdguardHome搭配SmartDNS综合优化方案, 开箱即用,实现恶意网站过滤+区分国内外域名解析加速+ 防污染+ DNS优选 (需在后台安装luci-app-adguardhome和luci-app-smartdns,K2P只需安装luci-app-smartdns)
++ 自定制清爽Material风格新主题Edge
 
 + 无需专业知识,无需linux服务器,人人皆可通过云编译定制编译自己的专属固件.
 
-+ 持续更新,  每周日零点定时自动云编译更新固件,不用再担心因停更而需更换固件.
++ 持续更新, 每周日零点定时自动云编译更新固件,不用再担心因停更而需更换固件.
 
-+ SSL兼容,可同时使用http IP访问和绑定域名开启https访问
 
-固件下载 [x86_64,phicomm-k2p,redmi-ac2100,nanopi-r2s,newifi-d2,hiwifi-HC5962,phicomm-N1](https://op.supes.top/firmware/),每周日更新固件.
+| 设备           | 固件下载                                             | 说明                                 |
+|----------------|-----------------------------------------------------|--------------------------------------|
+| X86_64         | [📥](https://op.supes.top/firmware/x86_64/)         | 请分配不少于800M的存储空间           |
+| Redmi-ac2100   | [📥](https://op.supes.top/firmware/redmi-ac2100/)   | 在breed中需要先刷底包                |
+| Phicomm-k2p    | [📥](https://op.supes.top/firmware/phicomm-k2p/)    | 闪存布局请选择斐讯而非默认的公版     |
+| K2p-32m-usb    | [📥](https://op.supes.top/firmware/k2p-32m-usb/)    | 闪存布局请选择斐讯而非默认的公版     |
+| NanoPi-r2s     | [📥](https://op.supes.top/firmware/nanopi-r2s/)     | 默认交换了网口,靠近电源口的是WAN口   |
+| Newifi-d2      | [📥](https://op.supes.top/firmware/newifi-d2/)      |                                      |
+| Hiwifi-hc5962  | [📥](https://op.supes.top/firmware/hiwifi-hc5962/)  |                                      |
+| Xiaomi-r3p     | [📥](https://op.supes.top/firmware/xiaomi-r3p/)     |                                      |
+| XY-C5          | [📥](https://op.supes.top/firmware/XY-C5/)          |                                      |
+
 
 后台入口 10.0.0.1 &nbsp;(若后台无法打开,请插拔交换wan,lan网线顺序.)
 
@@ -68,6 +76,7 @@ diy云编译教程: [Read the details in my blog (in Chinese) | 中文教程](ht
 
 + Opkg 软件包管理
 + SSR-PLUS
++ Adblock 基于DNS的广告过滤
 + UPNP 自动端口转发
 + Turbo ACC 网络加速
 

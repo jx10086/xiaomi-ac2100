@@ -2,27 +2,28 @@
 
 ln -sf /sbin/ip /usr/bin/ip
 
+sed -i '/openwrt_\(packages\|base\|custom\)/d' /etc/opkg/customfeeds.conf
 sed -i '/openwrt_custom/d' /etc/opkg/distfeeds.conf
-sed -i '/openwrt_custom/d' /etc/opkg/customfeeds.conf
-sed -i 's/downloads.openwrt.org/op.supes.top\/openwrt/g' /etc/opkg/distfeeds.conf
+sed -i 's/downloads.openwrt.org/op.supes.top/g' /etc/opkg/distfeeds.conf
 
-sed -i 's/http:/https:/g' /etc/opkg/distfeeds.conf
-sed -i "s/# //g" /etc/opkg/distfeeds.conf
-sed -i '/log-facility/d' /etc/dnsmasq.conf
-echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+grep -q log-facility /etc/dnsmasq.conf ||
+	echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+grep -q /etc/dnsmasq.d /etc/dnsmasq.conf ||
+	echo "conf-dir=/etc/dnsmasq.d" >> /etc/dnsmasq.conf
 
 sed -i '/profile.d/d' /lib/upgrade/keep.d/base-files
-sed -i 's/\[ -e "$FILE" \] && . "$FILE"/[ -e "$FILE" ] \&\& env -i bash "$FILE"/g' /etc/profile
 
 rm -rf /tmp/luci-*
 
-[ -f /etc/init.d/https-dns-proxy ] && /etc/init.d/https-dns-proxy disable
-
 sed -i '/S99opkg/d' /etc/crontabs/root
-echo "0 0 */3 * * sh /etc/rc.d/S99opkg >/dev/null 2>&1" >> /etc/crontabs/root
+echo "0 4 * * * sh /etc/rc.d/S99opkg >/dev/null 2>&1" >> /etc/crontabs/root
 
 uci set system.@rngd[0].enabled="1"
 uci commit system
+
+uci set uhttpd.main.rfc1918_filter=0
+uci set uhttpd.main.redirect_https=0
+uci commit uhttpd
 
 if [ ! -f /etc/config/placeholder ]; then
 
@@ -32,6 +33,8 @@ if [ ! -f /etc/config/placeholder ]; then
 	else
 		uci set dhcp.@dnsmasq[0].filter_aaaa='0'
 		uci commit dhcp
+		uci set turboacc.config.sfe_ipv6='1'
+		uci commit turboacc
 	fi
 
   uci set luci.main.lang=auto
@@ -49,25 +52,18 @@ if [ ! -f /etc/config/placeholder ]; then
   uci set network.wan.proto=pppoe
   uci commit network
 
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='1.1.1.1'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='1.0.0.1'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='8.8.8.8'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='8.8.4.4'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='9.9.9.9'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='9.9.9.10'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='9.9.9.11'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='104.16.248.249'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='104.16.249.249'
-  uci add_list shadowsocksr.@access_control[0].wan_fw_ips='149.112.112.11'
-  uci commit shadowsocksr
-
   uci set network.@globals[0].packet_steering=1
   uci commit network
+  
+  uci set dhcp.@dnsmasq[0].dns_redirect='1'
+  uci set dhcp.dnsmasq[0].allservers='1'
+  uci set dhcp.lan.force='1'
+  uci set dhcp.@dnsmasq[0].cachesize='1500'
+  uci set dhcp.lan.ra='hybrid'
+  uci set dhcp.lan.ndp='hybrid'
+  uci set dhcp.lan.dhcpv6='hybrid'
+  uci commit dhcp
 
-fi
-
-if [ ! -f /usr/bin/ssr-server ]; then
-  sed -i '/server-config/d' /usr/lib/lua/luci/controller/shadowsocksr.lua
 fi
 
 cp -R /www/cgi-bin/* /www/
@@ -75,11 +71,5 @@ find /www -type d -exec chmod 755 {} \;
 chmod +x /www/luci
 
 sed -i "s/git-.*-\(.*\)/git-\1/g" /usr/lib/lua/luci/version.lua
-
-grep -q reboot /etc/shinit ||
-	sed -i '$a alias reboot="(/sbin/reboot &);sleep 3;/sbin/reboot -f"\nalias /sbin/reboot="(/sbin/reboot &);sleep 3;/sbin/reboot -f"' /etc/shinit
-
-grep -q opkginstall /etc/profile ||
-	sed -i '/export ENV=\/etc\/shinit/a source /etc/profile.d/opkginstall.sh' /etc/profile
 
 ln -s /sbin/poweroff /sbin/shutdown
